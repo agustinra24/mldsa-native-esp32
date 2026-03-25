@@ -1,0 +1,18 @@
+version: "1.0.0-alpha"
+description: "ML-DSA-87 (FIPS 204) post-quantum digital signatures for ESP32, based on mldsa-native"
+url: "https://github.com/agustinra24/mldsa-native-esp32"
+repository: "https://github.com/agustinra24/mldsa-native-esp32.git"
+license: "Apache-2.0"
+targets:
+  - esp32
+tags:
+  - post-quantum
+  - cryptography
+  - ml-dsa
+  - dilithium
+  - fips-204
+  - digital-signatures
+  - pqc
+dependencies:
+  idf:
+    version: ">=5.0.0"

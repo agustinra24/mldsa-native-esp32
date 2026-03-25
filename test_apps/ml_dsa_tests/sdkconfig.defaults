@@ -1,0 +1,11 @@
+# Test app: needs WiFi for hardware TRNG
+CONFIG_ESP_WIFI_ENABLED=y
+
+# Increase main task stack
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# Enable Unity test framework
+CONFIG_UNITY_ENABLE_FLOAT=y
+
+# Enable newlib formatting for size_t (%zu)
+CONFIG_NEWLIB_NANO_FORMAT=n

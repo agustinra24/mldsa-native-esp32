@@ -1,0 +1,32 @@
+# ESP-IDF build artifacts
+build/
+build_*/
+sdkconfig
+sdkconfig.old
+managed_components/
+dependencies.lock
+.component_hash
+
+# Keep defaults tracked
+!sdkconfig.defaults
+
+# macOS
+.DS_Store
+._*
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+pytest_embedded_log/
+
+# Temporary files
+*.tmp
+*.swp
+*~
+.cache/
