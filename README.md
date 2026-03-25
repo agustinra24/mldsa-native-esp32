@@ -2,7 +2,7 @@
 
 **ML-DSA-87 (FIPS 204) post-quantum digital signatures for ESP32, based on [mldsa-native](https://github.com/pq-code-package/mldsa-native).**
 
-This is the first documented port of mldsa-native to the ESP32 platform (Xtensa LX6). It provides a ready-to-use ESP-IDF component for ML-DSA-87 (NIST Security Level 5), the post-quantum digital signature standard finalized by NIST in August 2024 as FIPS 204. ML-DSA is the successor to CRYSTALS-Dilithium, one of the algorithms selected by NIST's Post-Quantum Cryptography standardization process.
+This is the first documented port of the [mldsa-native](https://github.com/pq-code-package/mldsa-native) library to the ESP32 platform (Xtensa LX6). It provides a ready-to-use ESP-IDF component for ML-DSA-87 (NIST Security Level 5), the post-quantum digital signature standard finalized by NIST in August 2024 as FIPS 204. ML-DSA is the successor to CRYSTALS-Dilithium, one of the algorithms selected by NIST's Post-Quantum Cryptography standardization process. Note: ML-DSA (formerly CRYSTALS-Dilithium) has been demonstrated on ESP32 through other implementations (PQClean, wolfSSL, academic adaptations) since 2021; this port specifically targets the PQCA mldsa-native codebase, which offers CBMC formal verification and a configuration-driven integration model.
 
 The upstream mldsa-native library, maintained by the [pq-code-package](https://github.com/pq-code-package) project under the Linux Foundation's Post-Quantum Cryptography Alliance (PQCA), is vendored unmodified. All ESP32-specific adaptation is isolated in three custom files (a configuration header, a wrapper API, and a CMake build file), preserving upstream's CBMC formal verification coverage and valgrind constant-time guarantees.
 
@@ -28,13 +28,15 @@ The component uses only the portable scalar C90 backend (no assembly, no SIMD). 
 | Signature | up to 4,627 bytes |
 | Seed | 32 bytes |
 
-### Benchmarks (ESP32-WROOM-32D @ 240 MHz, N=1000)
+### Benchmarks (ESP32-WROOM-32D @ 240 MHz, N=10,000)
 
 | Operation | Mean | Std Dev | Notes |
 |-----------|------|---------|-------|
 | Key generation | 41.09 ms | 0.15 ms | Deterministic given seed |
 | Signing | 185.17 ms | 146.63 ms | Variable: rejection sampling (geometric distribution) |
 | Verification | 42.00 ms | 0.01 ms | Deterministic, constant-time |
+
+Configuration: standard (MLD_CONFIG_REDUCE_RAM disabled), MLD_CONFIG_CUSTOM_ALLOC_FREE enabled.
 
 ### Memory Footprint
 
@@ -75,7 +77,7 @@ ML-DSA is available in three parameter sets: ML-DSA-44 (Level 2), ML-DSA-65 (Lev
 
 ### Why NOT MLD_CONFIG_REDUCE_RAM
 
-The mldsa-native library offers an experimental `MLD_CONFIG_REDUCE_RAM` option that reduces peak heap usage by approximately 30 KB during key generation (from ~100 KB to ~63 KB for ML-DSA-87). This option is intentionally **not enabled** because:
+The mldsa-native library offers an experimental `MLD_CONFIG_REDUCE_RAM` option that reduces total heap allocation by approximately 50 KB during key generation (from ~113 KB to ~63 KB for ML-DSA-87). This option is intentionally **not enabled** because:
 
 1. It is marked experimental in the upstream codebase
 2. It is **not covered by upstream CBMC formal verification proofs**, which only validate the standard (non-reduced) configuration
@@ -84,7 +86,7 @@ The mldsa-native library offers an experimental `MLD_CONFIG_REDUCE_RAM` option t
 
 ### Stack-to-Heap Migration
 
-ML-DSA-87 key generation requires approximately 100 KB of temporary working memory. On desktop systems, this fits on the stack. On ESP32, the main FreeRTOS task has only 8-12 KB of stack by default. The configuration defines `MLD_CONFIG_CUSTOM_ALLOC_FREE` to redirect all large internal buffers to heap via `heap_caps_malloc()`:
+ML-DSA-87 key generation allocates up to ~113 KB across multiple internal buffers (measured concurrent peak: ~72 KB). On desktop systems, these buffers live on the stack. On ESP32, the main FreeRTOS task has only 8-12 KB of stack by default. The configuration defines `MLD_CONFIG_CUSTOM_ALLOC_FREE` to redirect all large internal buffers to heap via `heap_caps_malloc()`:
 
 ```c
 #define MLD_CUSTOM_ALLOC(v, T, N) \

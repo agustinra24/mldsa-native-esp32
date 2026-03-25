@@ -2,7 +2,7 @@
  * ML-DSA (FIPS 204) wrapper for ESP32
  *
  * Thin wrapper over mldsa-native providing ML-DSA-87 digital signatures
- * on ESP32 (Xtensa LX6). First documented ESP32 port of mldsa-native.
+ * on ESP32 (Xtensa LX6). First documented port of the mldsa-native library (PQCA) to ESP32.
  *
  * Key sizes (ML-DSA-87):
  *   Public key:  2592 bytes

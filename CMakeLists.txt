@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # ML-DSA (FIPS 204) component for ESP-IDF
 #
 # Source: mldsa-native v1.0.0-alpha (pq-code-package/mldsa-native)
